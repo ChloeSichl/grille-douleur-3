@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ma Douleur">
+<meta name="theme-color" content="#1a1a2e">
+<title>Grille d'Évaluation de la Douleur</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap');
+
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bot: env(safe-area-inset-bottom, 0px);
+  --font-display: 'Baloo 2', cursive;
+  --font-body: 'Nunito', sans-serif;
+  --navy: #1e1b4b;
+  --radius: 18px;
+  --shadow: 0 4px 20px rgba(0,0,0,0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { height: 100%; }
+body {
+  font-family: var(--font-body);
+  background: #f4f5fb;
+  min-height: 100vh;
+  padding-top: calc(var(--safe-top) + 8px);
+  padding-bottom: calc(var(--safe-bot) + 90px);
+}
+
+/* ── HEADER ── */
+.app-header {
+  text-align: center;
+  padding: 14px 20px 10px;
+}
+.app-header h1 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--navy);
+}
+.app-header p { font-size: 0.8rem; color: #64748b; margin-top: 3px; }
+.name-badge {
+  display: inline-block;
+  margin-top: 7px;
+  padding: 4px 14px;
+  background: #e0e7ff;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #3730a3;
+  cursor: pointer;
+}
+
+/* ── NAV ── */
+.nav {
+  display: flex;
+  gap: 5px;
+  padding: 0 14px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav::-webkit-scrollbar { display: none; }
+.nav button {
+  flex: 1;
+  min-width: 62px;
+  padding: 8px 4px;
+  border-radius: 13px;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: white;
+  color: #94a3b8;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: all .2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.nav button .ni { font-size: 1.1rem; }
+.nav button.active { background: var(--navy); color: white; box-shadow: 0 4px 16px rgba(30,27,75,0.25); }
+
+/* ── SCREENS ── */
+.screen { display: none; padding: 0 14px; animation: fadeIn .22s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+
+/* ── SECTION HEADERS ── */
+.sec-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 8px;
+}
+.sec-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 800; color: white;
+  flex-shrink: 0;
+}
+.sec-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--navy);
+}
+.sec-sub { font-size: 0.75rem; color: #64748b; margin-top: 1px; }
+
+/* ── INTENSITY SCALE ── */
+.scale-intro {
+  background: white;
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.scale-intro p { font-size: 0.82rem; color: #475569; line-height: 1.5; }
+
+.scale-cards { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+
+.lvl-card {
+  background: white;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  border: 2.5px solid transparent;
+  transition: all .2s cubic-bezier(.34,1.56,.64,1);
+  cursor: pointer;
+  position: relative;
+}
+.lvl-card:active { transform: scale(0.98); }
+.lvl-card.selected { border-color: var(--lvl-color); transform: scale(1.015); box-shadow: 0 6px 22px rgba(0,0,0,0.13); }
+
+.lvl-row { display: flex; align-items: stretch; }
+.lvl-badge {
+  width: 54px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 2px; flex-shrink: 0; padding: 10px 0;
+}
+.lvl-face { font-size: 1.35rem; line-height: 1; }
+.lvl-num { font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; line-height: 1; }
+
+.lvl-body { flex: 1; padding: 10px 12px 10px 6px; min-width: 0; }
+.lvl-name { font-family: var(--font-display); font-size: 0.95rem; font-weight: 800; margin-bottom: 2px; }
+.lvl-tagline { font-size: 0.74rem; font-style: italic; opacity: .72; margin-bottom: 6px; }
+.lvl-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip {
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: rgba(0,0,0,0.07);
+  white-space: nowrap;
+}
+
+.lvl-check {
+  position: absolute; top: 8px; right: 8px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--lvl-color);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transform: scale(0);
+  transition: all .2s cubic-bezier(.34,1.56,.64,1);
+}
+.lvl-card.selected .lvl-check { opacity: 1; transform: scale(1); }
+.lvl-check svg { width: 12px; height: 12px; }
+
+/* Selected display */
+.sel-display {
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 10px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  display: none;
+}
+.sel-display.vis { display: block; }
+.sel-face-big { font-size: 2.8rem; }
+.sel-num { font-family: var(--font-display); font-size: 3.5rem; font-weight: 800; line-height: 1; }
+.sel-name { font-family: var(--font-display); font-size: 1.1rem; font-weight: 800; margin-top: 4px; }
+.sel-tag { font-size: 0.8rem; font-style: italic; opacity: .75; margin-top: 3px; }
+
+/* ── BODY MAP ── */
+.body-map-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+  margin-bottom: 10px;
+}
+.body-map-wrap {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.body-svg-wrap { flex-shrink: 0; }
+.zone-chips-wrap { flex: 1; }
+.zone-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.zone-chip {
+  padding: 6px 11px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  cursor: pointer;
+  transition: all .15s;
+}
+.zone-chip.active { background: #fee2e2; border-color: #f87171; color: #7f1d1d; }
+
+.add-row {
+  display: flex; gap: 6px; margin-top: 8px;
+}
+.add-row input {
+  flex: 1;
+  padding: 7px 10px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  background: #f8fafc;
+  color: #1e293b;
+  outline: none;
+}
+.add-row input:focus { border-color: #6366f1; background: white; }
+.add-btn {
+  padding: 7px 12px;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  background: white;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+}
+
+/* ── PAIN TYPES ── */
+.type-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+  margin-bottom: 10px;
+}
+.type-grid { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
+.type-btn {
+  padding: 7px 12px;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  font-family: var(--font-body);
+  font-size: 0.77rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  transition: all .15s;
+}
+.type-btn.active { background: #fef3c7; border-color: #f59e0b; color: #78350f; }
+
+.word-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.word-chip {
+  padding: 5px 11px;
+  border-radius: 20px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+}
+.word-chip.active { background: #fef3c7; border-color: #f59e0b; color: #78350f; }
+
+/* ── ACTIVITIES ── */
+.act-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+  margin-bottom: 10px;
+}
+.act-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.act-item {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: all .15s;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  text-align: center;
+}
+.act-item .act-icon { font-size: 1.5rem; }
+.act-item .act-label { font-size: 0.75rem; font-weight: 700; color: #475569; }
+.act-item .act-state { font-size: 0.68rem; color: #94a3b8; }
+.act-item.yes { background: #fef2f2; border-color: #fca5a5; }
+.act-item.yes .act-label { color: #991b1b; }
+.act-item.yes .act-state { color: #dc2626; }
+.act-item.no { background: #f0fdf4; border-color: #86efac; }
+.act-item.no .act-label { color: #166534; }
+.act-item.no .act-state { color: #16a34a; }
+
+/* ── CHECKLIST ── */
+.check-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+  margin-bottom: 10px;
+}
+.check-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.check-item {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  transition: all .15s;
+}
+.check-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid #cbd5e1;
+  flex-shrink: 0;
+}
+.check-item.active { background: #eff6ff; border-color: #93c5fd; color: #1e40af; }
+.check-item.active .check-dot { background: #3b82f6; border-color: #3b82f6; }
+
+/* ── NOTE ── */
+.note-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+  margin-bottom: 10px;
+}
+.note-card textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: #1e293b;
+  background: #f8fafc;
+  resize: vertical;
+  min-height: 80px;
+  outline: none;
+}
+.note-card textarea:focus { border-color: #6366f1; background: white; }
+
+/* ── SAVE BTN ── */
+.save-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 16px;
+  border: none;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--navy), #3730a3);
+  color: white;
+  box-shadow: 0 6px 20px rgba(30,27,75,0.28);
+  margin-bottom: 10px;
+  display: none;
+  transition: all .2s;
+}
+.save-btn.vis { display: block; }
+.save-btn:active { transform: scale(0.97); }
+.saved-ok { text-align: center; font-size: 0.85rem; color: #16a34a; font-weight: 700; padding: 6px; display: none; }
+.saved-ok.show { display: block; }
+
+/* ── HISTORY ── */
+.hist-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.hist-top h2 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 800; color: var(--navy); }
+.hist-clear { font-size: 0.74rem; color: #94a3b8; background: none; border: none; font-family: var(--font-body); cursor: pointer; }
+
+.chart-box {
+  background: white; border-radius: var(--radius);
+  padding: 14px; margin-bottom: 10px; box-shadow: var(--shadow); display: none;
+}
+.chart-lbl { font-size: 0.72rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
+.chart-bars { display: flex; align-items: flex-end; gap: 5px; height: 70px; padding-bottom: 18px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; height: 100%; justify-content: flex-end; }
+.bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 3px; }
+.bar-n { font-size: 9px; font-weight: 700; color: #64748b; }
+.bar-d { font-size: 8px; color: #94a3b8; }
+
+.hist-list { display: flex; flex-direction: column; gap: 8px; }
+.hist-entry {
+  background: white; border-radius: 14px;
+  padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.hist-dot {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.hist-dot-face { font-size: 1rem; }
+.hist-dot-num { font-family: var(--font-display); font-size: 1.1rem; font-weight: 800; line-height: 1; }
+.hist-info { flex: 1; min-width: 0; }
+.hist-name { font-weight: 700; font-size: 0.88rem; color: #1e293b; }
+.hist-date { font-size: 0.72rem; color: #94a3b8; margin-top: 2px; }
+.hist-zones { font-size: 0.72rem; color: #64748b; margin-top: 3px; }
+.empty-box { text-align: center; padding: 36px 20px; color: #94a3b8; font-size: 0.88rem; }
+.empty-box .big { font-size: 2.2rem; margin-bottom: 8px; }
+
+/* ── PERSONALISE ── */
+.cust-card { background: white; border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); margin-bottom: 10px; }
+.cust-card h3 { font-family: var(--font-display); font-size: 0.92rem; font-weight: 800; color: var(--navy); margin-bottom: 8px; }
+.cust-card p { font-size: 0.78rem; color: #64748b; margin-bottom: 10px; line-height: 1.5; }
+.cust-item { display: flex; gap: 8px; align-items: center; padding: 7px 0; border-bottom: 1px solid #f1f5f9; }
+.cust-item:last-child { border-bottom: none; }
+.cust-item label { font-size: 0.74rem; font-weight: 700; color: #64748b; width: 70px; flex-shrink: 0; }
+.cust-item input { flex: 1; padding: 6px 10px; border: 1.5px solid #e2e8f0; border-radius: 9px; font-family: var(--font-body); font-size: 0.8rem; color: #1e293b; background: #f8fafc; outline: none; }
+.cust-item input:focus { border-color: #6366f1; background: white; }
+.cust-save { width: 100%; padding: 13px; border-radius: 14px; border: none; background: var(--navy); color: white; font-family: var(--font-display); font-size: 0.92rem; font-weight: 800; cursor: pointer; margin-top: 4px; }
+
+details { margin-bottom: 8px; border: 1.5px solid #e2e8f0; border-radius: 14px; overflow: hidden; }
+summary {
+  padding: 11px 14px; cursor: pointer; display: flex; align-items: center; gap: 9px;
+  font-weight: 700; font-size: 0.85rem; list-style: none; user-select: none;
+}
+summary::-webkit-details-marker { display: none; }
+.sum-arrow { margin-left: auto; opacity: .5; transition: transform .2s; font-size: 0.8rem; }
+details[open] .sum-arrow { transform: rotate(180deg); }
+.det-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; background: white; }
+.det-field label { display: block; font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+.det-field input, .det-field textarea { width: 100%; padding: 8px 10px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-family: var(--font-body); font-size: 0.82rem; color: #1e293b; background: #f8fafc; outline: none; resize: vertical; }
+.det-field input:focus, .det-field textarea:focus { border-color: #6366f1; background: white; }
+
+/* ── INSTALL ── */
+.install-card { background: white; border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; }
+.install-card h3 { font-family: var(--font-display); font-size: 0.95rem; font-weight: 800; color: var(--navy); margin-bottom: 10px; }
+.install-steps { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.install-steps li { display: flex; gap: 10px; align-items: flex-start; font-size: 0.82rem; color: #334155; line-height: 1.5; }
+.istep { width: 24px; height: 24px; border-radius: 50%; background: var(--navy); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; flex-shrink: 0; margin-top: 1px; }
+.tip-green { background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 13px; padding: 12px; margin-top: 10px; font-size: 0.8rem; color: #166534; font-weight: 600; line-height: 1.5; }
+
+/* ── MODAL ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100; display: none; align-items: flex-end; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: white; border-radius: 22px 22px 0 0; padding: 22px 18px calc(22px + var(--safe-bot)); width: 100%; max-width: 500px; animation: slideUp .28s cubic-bezier(.34,1.56,.64,1); }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: none; } }
+.modal h3 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 800; color: var(--navy); margin-bottom: 12px; }
+.modal input { width: 100%; padding: 11px 13px; border: 1.5px solid #e2e8f0; border-radius: 12px; font-family: var(--font-body); font-size: 0.95rem; color: #1e293b; outline: none; margin-bottom: 12px; }
+.modal input:focus { border-color: #6366f1; }
+.modal-btns { display: flex; gap: 8px; }
+.modal-btns button { flex: 1; padding: 13px; border-radius: 13px; border: none; font-family: var(--font-display); font-size: 0.92rem; font-weight: 800; cursor: pointer; }
+.m-cancel { background: #f1f5f9; color: #64748b; }
+.m-ok { background: var(--navy); color: white; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <h1>🩺 Grille d'Évaluation de la Douleur</h1>
+  <p>Co-construite avec mon équipe SAMSAH</p>
+  <div class="name-badge" onclick="openModal()" id="name-badge">👤 Ajouter mon prénom</div>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="sw('eval')"><span class="ni">📊</span>Évaluer</button>
+  <button onclick="sw('hist')"><span class="ni">📅</span>Historique</button>
+  <button onclick="sw('cust')"><span class="ni">✏️</span>Perso.</button>
+  <button onclick="sw('info')"><span class="ni">📱</span>Installer</button>
+</nav>
+
+<!-- ══ ÉVALUER ══ -->
+<div id="screen-eval" class="screen active">
+
+  <!-- 1. Intensité -->
+  <div class="sec-header">
+    <div class="sec-dot" style="background:#7c3aed">1</div>
+    <div><div class="sec-title">Intensité de la douleur</div><div class="sec-sub">Appuie sur le niveau qui te correspond</div></div>
+  </div>
+
+  <div class="scale-intro">
+    <p>Chaque carte montre un niveau de 0 à 10 avec des exemples concrets.<br>Appuie sur celle qui ressemble le plus à ce que tu ressens <strong>en ce moment</strong>.</p>
+  </div>
+
+  <div class="sel-display" id="sel-display">
+    <div class="sel-face-big" id="sel-face"></div>
+    <div class="sel-num" id="sel-num"></div>
+    <div class="sel-name" id="sel-name"></div>
+    <div class="sel-tag" id="sel-tag"></div>
+  </div>
+
+  <div class="scale-cards" id="scale-cards"></div>
+
+  <!-- 2. Localisation -->
+  <div class="sec-header">
+    <div class="sec-dot" style="background:#0891b2">2</div>
+    <div><div class="sec-title">Où as-tu mal ?</div><div class="sec-sub">Coche les zones douloureuses</div></div>
+  </div>
+  <div class="body-map-card">
+    <div class="body-map-wrap">
+      <div class="body-svg-wrap">
+        <svg width="90" height="190" viewBox="0 0 90 190" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse id="svg-tete" cx="45" cy="20" rx="17" ry="19" fill="#e0f2fe" stroke="#0891b2" stroke-width="1.2" style="cursor:pointer" onclick="toggleZoneSvg('Tête','svg-tete')"/>
+          <rect id="svg-cou" x="38" y="38" width="14" height="11" rx="4" fill="#e0f2fe" stroke="#0891b2" stroke-width="1.2" style="cursor:pointer" onclick="toggleZoneSvg('Cou','svg-cou')"/>
+          <rect id="svg-thorax" x="24" y="49" width="42" height="38" rx="7" fill="#e0f2fe" stroke="#0891b2" stroke-width="1.2" style="cursor:pointer" onclick="toggleZoneSvg('Thorax','svg-thorax')"/>
+          <rect id="svg-ventre" x="26" y="87" width="38" height="28" rx="5" fill="#e0f2fe" stroke="#0891b2" stroke-width="1.2" style="cursor:pointer" onclick="toggleZoneSvg('Ventre','svg-ventre')"/>
+          <rect id="svg-brasG" x="8" y="49" width="14" height="48" rx="6" fill="#e0f2fe" stroke="#0891b2" stroke-width="1.2" style="cursor:pointer" onclick="toggleZoneSvg('Bras gauche','svg-brasG')"/>
+          <rect id="svg-brasD" x="68" y="49" width="14" height="48" rx="6" fill="#e0f2fe" stroke="#0891b2" stroke-width="1.2" style="cursor:pointer" onclick="toggleZoneSvg('Bras droit','svg-brasD')"/>
+          <rect id="svg-jambeG" x="26" y="117" width="16" height="60" rx="6" fill="#e0f2fe" stroke="#0891b2" stroke-width="1.2" style="cursor:pointer" onclick="toggleZoneSvg('Jambe gauche','svg-jambeG')"/>
+          <rect id="svg-jambeD" x="48" y="117" width="16" height="60" rx="6" fill="#e0f2fe" stroke="#0891b2" stroke-width="1.2" style="cursor:pointer" onclick="toggleZoneSvg('Jambe droite','svg-jambeD')"/>
+          <text x="45" y="63" text-anchor="middle" font-size="7" fill="#0891b2" font-family="sans-serif">thorax</text>
+          <text x="45" y="100" text-anchor="middle" font-size="7" fill="#0891b2" font-family="sans-serif">ventre</text>
+        </svg>
+      </div>
+      <div class="zone-chips-wrap">
+        <div class="zone-chips" id="zone-chips"></div>
+        <div class="add-row" style="margin-top:8px">
+          <input id="zone-input" type="text" placeholder="Autre zone..." />
+          <button class="add-btn" onclick="addZone()">+ Ajouter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Type -->
+  <div class="sec-header">
+    <div class="sec-dot" style="background:#d97706">3</div>
+    <div><div class="sec-title">Comment est cette douleur ?</div><div class="sec-sub">Plusieurs choix possibles</div></div>
+  </div>
+  <div class="type-card">
+    <div class="type-grid" id="type-grid"></div>
+    <div class="sec-sub" style="margin-bottom:6px">Mes propres mots :</div>
+    <div class="word-chips" id="word-chips"></div>
+    <div class="add-row">
+      <input id="word-input" type="text" placeholder="Ajouter un mot..." />
+      <button class="add-btn" onclick="addWord()">+ Ajouter</button>
+    </div>
+  </div>
+
+  <!-- 4. Impact -->
+  <div class="sec-header">
+    <div class="sec-dot" style="background:#059669">4</div>
+    <div><div class="sec-title">Impact sur mes activités</div><div class="sec-sub">Appuie pour basculer entre gêné / pas gêné</div></div>
+  </div>
+  <div class="act-card">
+    <div class="act-grid" id="act-grid"></div>
+  </div>
+
+  <!-- 5. Déclencheurs -->
+  <div class="sec-header">
+    <div class="sec-dot" style="background:#dc2626">5</div>
+    <div><div class="sec-title">Facteurs déclencheurs</div><div class="sec-sub">Qu'est-ce qui a pu provoquer la douleur ?</div></div>
+  </div>
+  <div class="check-card">
+    <div class="check-list" id="trig-list"></div>
+    <div class="add-row">
+      <input id="trig-input" type="text" placeholder="Autre déclencheur..." />
+      <button class="add-btn" onclick="addTrig()">+ Ajouter</button>
+    </div>
+  </div>
+
+  <!-- 6. Stratégies -->
+  <div class="sec-header">
+    <div class="sec-dot" style="background:#0284c7">6</div>
+    <div><div class="sec-title">Ce qui m'aide</div><div class="sec-sub">Mes stratégies de soulagement</div></div>
+  </div>
+  <div class="check-card">
+    <div class="check-list" id="strat-list"></div>
+    <div class="add-row">
+      <input id="strat-input" type="text" placeholder="Autre stratégie..." />
+      <button class="add-btn" onclick="addStrat()">+ Ajouter</button>
+    </div>
+  </div>
+
+  <!-- 7. Note -->
+  <div class="sec-header">
+    <div class="sec-dot" style="background:#475569">7</div>
+    <div><div class="sec-title">Note libre</div><div class="sec-sub">Facultatif</div></div>
+  </div>
+  <div class="note-card">
+    <textarea id="free-note" placeholder="Ce que tu veux ajouter..."></textarea>
+  </div>
+
+  <button class="save-btn" id="save-btn" onclick="saveEval()">✅ Enregistrer cette évaluation</button>
+  <div class="saved-ok" id="saved-ok">Évaluation enregistrée ! 🎉</div>
+
+</div>
+
+<!-- ══ HISTORIQUE ══ -->
+<div id="screen-hist" class="screen">
+  <div class="hist-top">
+    <h2>Mes évaluations</h2>
+    <button class="hist-clear" onclick="clearHist()">Tout effacer</button>
+  </div>
+  <div class="chart-box" id="chart-box">
+    <div class="chart-lbl">7 dernières évaluations — score /10</div>
+    <div class="chart-bars" id="chart-bars"></div>
+  </div>
+  <div class="hist-list" id="hist-list"></div>
+</div>
+
+<!-- ══ PERSONNALISER ══ -->
+<div id="screen-cust" class="screen">
+  <div class="cust-card">
+    <h3>🎨 Adapter les niveaux de douleur</h3>
+    <p>Tu peux changer le nom et les exemples de chaque niveau pour qu'ils te correspondent mieux. Ces changements seront sauvegardés sur cet appareil.</p>
+    <div id="cust-levels"></div>
+    <button class="cust-save" onclick="saveCust()">💾 Enregistrer mes changements</button>
+  </div>
+  <div class="cust-card">
+    <h3>📋 Mes listes personnalisées</h3>
+    <p>Ajoute tes propres éléments directement depuis l'onglet Évaluer (boutons « + Ajouter »). Ils apparaîtront automatiquement ici.</p>
+    <div class="cust-item"><label>Zones</label><span id="cust-zones-count" style="font-size:.8rem;color:#64748b"></span></div>
+    <div class="cust-item"><label>Déclencheurs</label><span id="cust-trigs-count" style="font-size:.8rem;color:#64748b"></span></div>
+    <div class="cust-item"><label>Stratégies</label><span id="cust-strats-count" style="font-size:.8rem;color:#64748b"></span></div>
+  </div>
+</div>
+
+<!-- ══ INSTALLER ══ -->
+<div id="screen-info" class="screen">
+  <div class="install-card">
+    <h3>📱 Ajouter à l'écran d'accueil (iPhone)</h3>
+    <ol class="install-steps">
+      <li><span class="istep">1</span><span>Ouvre cette page dans <strong>Safari</strong> sur ton iPhone (pas Chrome)</span></li>
+      <li><span class="istep">2</span><span>Appuie sur l'icône <strong>Partager ↑</strong> en bas de Safari</span></li>
+      <li><span class="istep">3</span><span>Dans la liste, appuie sur <strong>« Sur l'écran d'accueil »</strong></span></li>
+      <li><span class="istep">4</span><span>Appuie sur <strong>« Ajouter »</strong> en haut à droite. L'icône apparaît !</span></li>
+    </ol>
+    <div class="tip-green">✅ Une fois installé, l'outil fonctionne même sans connexion internet. Toutes tes évaluations sont sauvegardées sur ton iPhone.</div>
+  </div>
+  <div class="install-card">
+    <h3>🔒 Confidentialité</h3>
+    <p style="font-size:.82rem;color:#475569;line-height:1.6">Toutes les données (évaluations, personnalisations, prénom) restent <strong>uniquement sur cet appareil</strong>. Rien n'est envoyé sur internet.</p>
+  </div>
+</div>
+
+<!-- MODAL NOM -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOut(event)">
+  <div class="modal">
+    <h3>👤 Mon prénom</h3>
+    <input type="text" id="modal-input" placeholder="Écris ton prénom..." maxlength="30" />
+    <div class="modal-btns">
+      <button class="m-cancel" onclick="closeModal()">Annuler</button>
+      <button class="m-ok" onclick="saveName()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DEFAULT DATA ──────────────────────────────────────────────────────────────
+
+const DEFAULT_LEVELS = [
+  { face:'😌', color:'#4ade80', bg:'#f0fdf4', tc:'#166534',
+    name:'Pas de douleur', tagline:'Je me sens bien',
+    examples:['Comme d\'habitude','Aucune gêne','Je peux tout faire'] },
+  { face:'🙂', color:'#86efac', bg:'#f0fdf4', tc:'#166534',
+    name:'Douleur très légère', tagline:'À peine perceptible',
+    examples:['Comme une légère démangeaison','On peut l\'oublier','Aucune gêne pour agir'] },
+  { face:'😐', color:'#fde047', bg:'#fefce8', tc:'#713f12',
+    name:'Douleur légère', tagline:'On la remarque',
+    examples:['Comme une légère pression','Comme après une petite chute','Un peu présente mais supportable'] },
+  { face:'😕', color:'#fb923c', bg:'#fff7ed', tc:'#7c2d12',
+    name:'Douleur modérée', tagline:'Elle distrait',
+    examples:['Comme une piqûre de guêpe','Comme un muscle froissé','J\'y pense souvent'] },
+  { face:'😟', color:'#f87171', bg:'#fef2f2', tc:'#7f1d1d',
+    name:'Douleur assez forte', tagline:'Difficile à ignorer',
+    examples:['Comme un coup reçu fort','Comme une dent qui fait mal','Ça perturbe ce que je fais'] },
+  { face:'😣', color:'#ef4444', bg:'#fef2f2', tc:'#7f1d1d',
+    name:'Douleur forte', tagline:'Elle prend beaucoup de place',
+    examples:['Comme une brûlure vive','Comme tordre un muscle','Je ne peux plus me concentrer'] },
+  { face:'😖', color:'#dc2626', bg:'#fef2f2', tc:'#7f1d1d',
+    name:'Douleur très forte', tagline:'Très difficile à supporter',
+    examples:['Comme un os cassé','Comme une migraine intense','Je dois m\'arrêter'] },
+  { face:'😫', color:'#b91c1c', bg:'#fff1f2', tc:'#450a0a',
+    name:'Douleur sévère', tagline:'Je souffre beaucoup',
+    examples:['Comme des éclairs dans le corps','Chaque mouvement fait mal','Je ne peux presque rien faire'] },
+  { face:'😰', color:'#991b1b', bg:'#fff1f2', tc:'#4c0519',
+    name:'Douleur intense', tagline:'Insupportable sur la durée',
+    examples:['Comme si quelque chose se déchire','Je ne peux pas rester en place','J\'ai besoin d\'aide maintenant'] },
+  { face:'😭', color:'#7f1d1d', bg:'#fdf4ff', tc:'#3b0764',
+    name:'Douleur extrême', tagline:'Au bout de mes limites',
+    examples:['Comme une douleur qui envahit tout','Je ne peux plus penser à autre chose','Urgence médicale possible'] },
+  { face:'🤯', color:'#450a0a', bg:'#fdf4ff', tc:'#581c87',
+    name:'Douleur maximale', tagline:'La pire douleur imaginable',
+    examples:['Insupportable','Je ne peux plus rien faire','J\'ai besoin d\'aide immédiatement'] }
+];
+
+const ZONE_IDS = {
+  'Tête':'svg-tete','Cou':'svg-cou','Thorax':'svg-thorax','Ventre':'svg-ventre',
+  'Bras gauche':'svg-brasG','Bras droit':'svg-brasD',
+  'Jambe gauche':'svg-jambeG','Jambe droite':'svg-jambeD'
+};
+const ACTIVE_SVG_COLOR = '#fca5a5';
+const ACTIVE_SVG_STROKE = '#dc2626';
+
+const DEFAULT_ZONES   = Object.keys(ZONE_IDS).concat(['Dos / bas du dos']);
+const DEFAULT_TYPES   = [
+  {icon:'🔥',label:'Brûlante'},{icon:'⚡',label:'Élançante'},{icon:'💓',label:'Pulsatile'},
+  {icon:'🪨',label:'Sourde'},{icon:'🔪',label:'Vive'},{icon:'🌫️',label:'Diffuse'},
+  {icon:'🫷',label:'En pression'},{icon:'🗜️',label:'En étau'},
+  {icon:'☀️',label:'Irradiante'},{icon:'⚡',label:'Électrique'},{icon:'📌',label:'Lancinante'}
+];
+const DEFAULT_ACTS    = [
+  {icon:'🛌',label:'Dormir'},{icon:'🍽️',label:'Manger'},{icon:'🚶',label:'Marcher'},
+  {icon:'🧠',label:'Me concentrer'},{icon:'💻',label:'Travailler'},{icon:'🎮',label:'Activité préférée'},
+  {icon:'🌳',label:'Sortir'},{icon:'💬',label:'Interagir'}
+];
+const DEFAULT_TRIGS   = ['Bruit fort','Lumière vive','Stress','Fatigue','Mouvement',
+                          'Alimentation','Foule','Changement de routine','Effort physique','Température'];
+const DEFAULT_STRATS  = ['Rester allongé(e)','Musique douce','Obscurité','Chaud / compresse',
+                          'Froid / glace','Respiration lente','Être seul(e)','Distraction',
+                          'Médicament','Boire de l\'eau','Massage'];
+
+let S = JSON.parse(localStorage.getItem('grille_state') || 'null') || {
+  name: '',
+  levels: JSON.parse(JSON.stringify(DEFAULT_LEVELS)),
+  zones: [...DEFAULT_ZONES],
+  customWords: [],
+  triggers: [...DEFAULT_TRIGS],
+  strategies: [...DEFAULT_STRATS],
+  history: []
+};
+
+function save() { localStorage.setItem('grille_state', JSON.stringify(S)); }
+
+// ── EVAL STATE ────────────────────────────────────────────────────────────────
+let ev = resetEv();
+function resetEv() {
+  return { score: null, zones: new Set(), types: new Set(), words: new Set(),
+           acts: {}, triggers: new Set(), strategies: new Set(), note: '' };
+}
+
+// ── SCALE ─────────────────────────────────────────────────────────────────────
+function buildScale() {
+  const wrap = document.getElementById('scale-cards');
+  wrap.innerHTML = '';
+  S.levels.forEach((lvl, i) => {
+    const card = document.createElement('div');
+    card.className = 'lvl-card' + (ev.score === i ? ' selected' : '');
+    card.style.setProperty('--lvl-color', lvl.color);
+    const chips = lvl.examples.map(e =>
+      `<span class="chip" style="background:${lvl.color}33;color:${lvl.tc}">${e}</span>`
+    ).join('');
+    card.innerHTML = `
+      <div class="lvl-row">
+        <div class="lvl-badge" style="background:${lvl.color}22">
+          <div class="lvl-face">${lvl.face}</div>
+          <div class="lvl-num" style="color:${lvl.tc}">${i}</div>
+        </div>
+        <div class="lvl-body">
+          <div class="lvl-name" style="color:${lvl.tc}">${lvl.name}</div>
+          <div class="lvl-tagline" style="color:${lvl.tc}">${lvl.tagline}</div>
+          <div class="lvl-chips">${chips}</div>
+        </div>
+      </div>
+      <div class="lvl-check" style="background:${lvl.color}">
+        <svg viewBox="0 0 12 12" fill="none"><path d="M2 6l2.8 3L10 3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>`;
+    card.onclick = () => selectScore(i);
+    wrap.appendChild(card);
+  });
+}
+
+function selectScore(i) {
+  ev.score = i;
+  const lvl = S.levels[i];
+  document.querySelectorAll('.lvl-card').forEach((c,j) => c.classList.toggle('selected', j===i));
+  const d = document.getElementById('sel-display');
+  d.style.background = lvl.bg; d.style.color = lvl.tc;
+  d.classList.add('vis');
+  document.getElementById('sel-face').textContent = lvl.face;
+  document.getElementById('sel-num').textContent = i;
+  document.getElementById('sel-name').textContent = lvl.name;
+  document.getElementById('sel-tag').textContent = lvl.tagline;
+  document.getElementById('save-btn').classList.add('vis');
+  document.getElementById('saved-ok').classList.remove('show');
+  d.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// ── ZONES ─────────────────────────────────────────────────────────────────────
+function buildZones() {
+  const wrap = document.getElementById('zone-chips');
+  wrap.innerHTML = '';
+  S.zones.forEach(z => {
+    const chip = document.createElement('span');
+    chip.className = 'zone-chip' + (ev.zones.has(z) ? ' active' : '');
+    chip.textContent = z;
+    chip.onclick = () => toggleZone(z, chip);
+    wrap.appendChild(chip);
+  });
+}
+
+function toggleZone(z, chip) {
+  ev.zones.has(z) ? ev.zones.delete(z) : ev.zones.add(z);
+  chip && chip.classList.toggle('active', ev.zones.has(z));
+  // SVG highlight
+  const svgId = ZONE_IDS[z];
+  if (svgId) {
+    const el = document.getElementById(svgId);
+    if (el) {
+      el.setAttribute('fill', ev.zones.has(z) ? ACTIVE_SVG_COLOR : '#e0f2fe');
+      el.setAttribute('stroke', ev.zones.has(z) ? ACTIVE_SVG_STROKE : '#0891b2');
+    }
+  }
+}
+
+function toggleZoneSvg(z, svgId) {
+  ev.zones.has(z) ? ev.zones.delete(z) : ev.zones.add(z);
+  const el = document.getElementById(svgId);
+  if (el) {
+    el.setAttribute('fill', ev.zones.has(z) ? ACTIVE_SVG_COLOR : '#e0f2fe');
+    el.setAttribute('stroke', ev.zones.has(z) ? ACTIVE_SVG_STROKE : '#0891b2');
+  }
+  buildZones();
+}
+
+function addZone() {
+  const v = document.getElementById('zone-input').value.trim();
+  if (!v) return;
+  if (!S.zones.includes(v)) S.zones.push(v);
+  ev.zones.add(v);
+  document.getElementById('zone-input').value = '';
+  save(); buildZones();
+}
+
+// ── TYPES ─────────────────────────────────────────────────────────────────────
+function buildTypes() {
+  const tg = document.getElementById('type-grid');
+  tg.innerHTML = '';
+  DEFAULT_TYPES.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'type-btn' + (ev.types.has(t.label) ? ' active' : '');
+    btn.innerHTML = `${t.icon} ${t.label}`;
+    btn.onclick = () => { ev.types.has(t.label) ? ev.types.delete(t.label) : ev.types.add(t.label); btn.classList.toggle('active'); };
+    tg.appendChild(btn);
+  });
+  const wc = document.getElementById('word-chips');
+  wc.innerHTML = '';
+  S.customWords.forEach(w => {
+    const chip = document.createElement('span');
+    chip.className = 'word-chip' + (ev.words.has(w) ? ' active' : '');
+    chip.textContent = w;
+    chip.onclick = () => { ev.words.has(w) ? ev.words.delete(w) : ev.words.add(w); chip.classList.toggle('active'); };
+    wc.appendChild(chip);
+  });
+}
+
+function addWord() {
+  const v = document.getElementById('word-input').value.trim();
+  if (!v) return;
+  if (!S.customWords.includes(v)) S.customWords.push(v);
+  ev.words.add(v);
+  document.getElementById('word-input').value = '';
+  save(); buildTypes();
+}
+
+// ── ACTIVITIES ────────────────────────────────────────────────────────────────
+function buildActs() {
+  const g = document.getElementById('act-grid');
+  g.innerHTML = '';
+  DEFAULT_ACTS.forEach(a => {
+    const d = document.createElement('div');
+    const s = ev.acts[a.label];
+    d.className = 'act-item' + (s === 'yes' ? ' yes' : s === 'no' ? ' no' : '');
+    d.innerHTML = `<div class="act-icon">${a.icon}</div><div class="act-label">${a.label}</div><div class="act-state">${s==='yes'?'😣 Gêné(e)':s==='no'?'✅ Pas gêné(e)':'Appuie pour évaluer'}</div>`;
+    d.onclick = () => { ev.acts[a.label] = ev.acts[a.label]==='yes' ? 'no' : ev.acts[a.label]==='no' ? undefined : 'yes'; buildActs(); };
+    g.appendChild(d);
+  });
+}
+
+// ── TRIGGERS ──────────────────────────────────────────────────────────────────
+function buildList(containerId, items, set, inputKey) {
+  const g = document.getElementById(containerId);
+  g.innerHTML = '';
+  items.forEach(item => {
+    const d = document.createElement('div');
+    d.className = 'check-item' + (set.has(item) ? ' active' : '');
+    d.innerHTML = `<span class="check-dot"></span>${item}`;
+    d.onclick = () => { set.has(item) ? set.delete(item) : set.add(item); d.classList.toggle('active'); d.querySelector('.check-dot').style.background = set.has(item) ? '#3b82f6' : ''; };
+    g.appendChild(d);
+  });
+}
+
+function addTrig() {
+  const v = document.getElementById('trig-input').value.trim();
+  if (!v) return;
+  if (!S.triggers.includes(v)) S.triggers.push(v);
+  ev.triggers.add(v);
+  document.getElementById('trig-input').value = '';
+  save(); buildList('trig-list', S.triggers, ev.triggers, 'trig-input');
+}
+
+function addStrat() {
+  const v = document.getElementById('strat-input').value.trim();
+  if (!v) return;
+  if (!S.strategies.includes(v)) S.strategies.push(v);
+  ev.strategies.add(v);
+  document.getElementById('strat-input').value = '';
+  save(); buildList('strat-list', S.strategies, ev.strategies, 'strat-input');
+}
+
+// ── SAVE EVAL ─────────────────────────────────────────────────────────────────
+function saveEval() {
+  if (ev.score === null) return;
+  const lvl = S.levels[ev.score];
+  const entry = {
+    score: ev.score, face: lvl.face, name: lvl.name,
+    color: lvl.color, bg: lvl.bg, tc: lvl.tc,
+    zones: [...ev.zones],
+    types: [...ev.types, ...ev.words],
+    acts: { ...ev.acts },
+    triggers: [...ev.triggers],
+    strategies: [...ev.strategies],
+    note: document.getElementById('free-note').value,
+    date: new Date().toISOString()
+  };
+  S.history.unshift(entry);
+  if (S.history.length > 40) S.history.pop();
+  save();
+  const ok = document.getElementById('saved-ok');
+  ok.classList.add('show');
+  setTimeout(() => ok.classList.remove('show'), 2500);
+  // Reset
+  ev = resetEv();
+  buildScale(); buildZones(); buildTypes(); buildActs();
+  buildList('trig-list', S.triggers, ev.triggers);
+  buildList('strat-list', S.strategies, ev.strategies);
+  document.getElementById('free-note').value = '';
+  document.getElementById('sel-display').classList.remove('vis');
+  document.getElementById('save-btn').classList.remove('vis');
+}
+
+// ── HISTORY ───────────────────────────────────────────────────────────────────
+function renderHist() {
+  const list = document.getElementById('hist-list');
+  const chartBox = document.getElementById('chart-box');
+  if (!S.history.length) {
+    chartBox.style.display = 'none';
+    list.innerHTML = `<div class="empty-box"><div class="big">📭</div>Aucune évaluation enregistrée.<br>Commence par l'onglet Évaluer !</div>`;
+    return;
+  }
+  chartBox.style.display = 'block';
+  const recent = S.history.slice(0,7).reverse();
+  document.getElementById('chart-bars').innerHTML = recent.map(e => {
+    const h = Math.round((e.score/10)*52);
+    const d = new Date(e.date);
+    const label = d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'});
+    return `<div class="bar-col"><span class="bar-n">${e.score}</span><div class="bar" style="height:${h}px;background:${e.color}"></div><span class="bar-d">${label}</span></div>`;
+  }).join('');
+
+  list.innerHTML = S.history.map(e => {
+    const d = new Date(e.date);
+    const ds = d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+    const ts = d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    const zonesStr = e.zones && e.zones.length ? `📍 ${e.zones.slice(0,3).join(', ')}${e.zones.length>3?'…':''}` : '';
+    const stratStr = e.strategies && e.strategies.length ? `💡 ${e.strategies.slice(0,2).join(', ')}` : '';
+    return `<div class="hist-entry">
+      <div class="hist-dot" style="background:${e.bg||'#f0fdf4'}">
+        <div class="hist-dot-face">${e.face}</div>
+        <div class="hist-dot-num" style="color:${e.tc||'#166534'}">${e.score}</div>
+      </div>
+      <div class="hist-info">
+        <div class="hist-name">${e.name}</div>
+        <div class="hist-date">${ds} à ${ts}</div>
+        ${zonesStr ? `<div class="hist-zones">${zonesStr}</div>` : ''}
+        ${stratStr ? `<div class="hist-zones">${stratStr}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function clearHist() {
+  if (!confirm('Effacer tout l\'historique ?')) return;
+  S.history = []; save(); renderHist();
+}
+
+// ── CUSTOMISE ─────────────────────────────────────────────────────────────────
+function buildCust() {
+  document.getElementById('cust-zones-count').textContent = `${S.zones.length} zones`;
+  document.getElementById('cust-trigs-count').textContent = `${S.triggers.length} déclencheurs`;
+  document.getElementById('cust-strats-count').textContent = `${S.strategies.length} stratégies`;
+
+  const wrap = document.getElementById('cust-levels');
+  wrap.innerHTML = S.levels.map((lvl,i) => `
+    <details>
+      <summary style="background:${lvl.bg};color:${lvl.tc}">
+        <span style="font-size:1.15rem">${lvl.face}</span>
+        <span>Niveau ${i} — ${lvl.name}</span>
+        <span class="sum-arrow">▾</span>
+      </summary>
+      <div class="det-body">
+        <div class="det-field">
+          <label>Nom du niveau</label>
+          <input type="text" id="cn-${i}" value="${lvl.name}" />
+        </div>
+        <div class="det-field">
+          <label>Sous-titre / ressenti</label>
+          <input type="text" id="ct-${i}" value="${lvl.tagline}" />
+        </div>
+        <div class="det-field">
+          <label>Mes exemples (séparés par des virgules)</label>
+          <textarea id="ce-${i}" rows="2">${lvl.examples.join(', ')}</textarea>
+        </div>
+      </div>
+    </details>
+  `).join('');
+}
+
+function saveCust() {
+  S.levels.forEach((lvl,i) => {
+    const n = document.getElementById(`cn-${i}`);
+    const t = document.getElementById(`ct-${i}`);
+    const e = document.getElementById(`ce-${i}`);
+    if (n) lvl.name = n.value.trim() || lvl.name;
+    if (t) lvl.tagline = t.value.trim() || lvl.tagline;
+    if (e) lvl.examples = e.value.split(',').map(x=>x.trim()).filter(Boolean);
+  });
+  save(); buildScale();
+  alert('✅ Personnalisations enregistrées !');
+}
+
+// ── NAME ──────────────────────────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('modal-input').value = S.name;
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('modal-input').focus(), 300);
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+function closeModalOut(e) { if (e.target === document.getElementById('modal-overlay')) closeModal(); }
+function saveName() {
+  S.name = document.getElementById('modal-input').value.trim();
+  save(); updateBadge(); closeModal();
+}
+function updateBadge() {
+  document.getElementById('name-badge').textContent = S.name ? `👤 ${S.name}` : '👤 Ajouter mon prénom';
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+const TABS = ['eval','hist','cust','info'];
+function sw(t) {
+  document.querySelectorAll('.nav button').forEach((b,i) => b.classList.toggle('active', TABS[i]===t));
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-'+t).classList.add('active');
+  if (t==='hist') renderHist();
+  if (t==='cust') buildCust();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+updateBadge();
+buildScale();
+buildZones();
+buildTypes();
+buildActs();
+buildList('trig-list', S.triggers, ev.triggers);
+buildList('strat-list', S.strategies, ev.strategies);
+</script>
+</body>
+</html>
